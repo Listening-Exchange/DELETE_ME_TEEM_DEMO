@@ -125,8 +125,9 @@ gageStackBlurParmCompare(const gageStackBlurParm *aa, const char *_nameA,
                          char explain[AIR_STRLEN_LARGE + 1]) {
   static const char me[] = "gageStackBlurParmCompare", baseA[] = "A", baseB[] = "B";
   const char *nameA, *nameB;
-  unsigned int si, warnLen = AIR_STRLEN_LARGE / 4;
-  char stmp[2][AIR_STRLEN_LARGE + 1], subexplain[AIR_STRLEN_LARGE + 1];
+#define ASL AIR_STRLEN_LARGE
+  unsigned int si, warnLen = ASL / 4;
+  char stmp[2][ASL + 1], subexplain[ASL + 1];
 
   if (!(aa && bb && differ)) {
     biffAddf(GAGE, "%s: got NULL pointer (%p %p %p)", me, AIR_CVOIDP(aa), AIR_CVOIDP(bb),
@@ -136,7 +137,7 @@ gageStackBlurParmCompare(const gageStackBlurParm *aa, const char *_nameA,
   nameA = _nameA ? _nameA : baseA;
   nameB = _nameB ? _nameB : baseB;
   if (strlen(nameA) + strlen(nameB) > warnLen) {
-    biffAddf(GAGE, "%s: names (len %s, %s) might lead to overflow", me,
+    biffAddf(GAGE, "%s: names (len %s, %s) might cause string buffer overflow", me,
              airSprintSize_t(stmp[0], strlen(nameA)),
              airSprintSize_t(stmp[1], strlen(nameB)));
     return 1;
@@ -160,8 +161,8 @@ gageStackBlurParmCompare(const gageStackBlurParm *aa, const char *_nameA,
 #define CHECK(VAR, FMT)                                                                 \
   if (aa->VAR != bb->VAR) {                                                             \
     if (explain) {                                                                      \
-      sprintf(explain, "%s->" #VAR "=" #FMT " != %s->" #VAR "=" #FMT, nameA, aa->VAR,   \
-              nameB, bb->VAR);                                                          \
+      snprintf(explain, ASL + 1, "%s->" #VAR "=" #FMT " != %s->" #VAR "=" #FMT, nameA,  \
+               aa->VAR, nameB, bb->VAR);                                                \
     }                                                                                   \
     *differ = 1;                                                                        \
     return 0;                                                                           \
@@ -180,9 +181,9 @@ gageStackBlurParmCompare(const gageStackBlurParm *aa, const char *_nameA,
 #undef CHECK
   if (aa->sigmaSampling != bb->sigmaSampling) {
     if (explain) {
-      sprintf(explain, "%s->sigmaSampling=%s != %s->sigmaSampling=%s", nameA,
-              airEnumStr(gageSigmaSampling, aa->sigmaSampling), nameB,
-              airEnumStr(gageSigmaSampling, bb->sigmaSampling));
+      snprintf(explain, ASL + 1, "%s->sigmaSampling=%s != %s->sigmaSampling=%s", nameA,
+               airEnumStr(gageSigmaSampling, aa->sigmaSampling), nameB,
+               airEnumStr(gageSigmaSampling, bb->sigmaSampling));
     }
     *differ = 1;
     return 0;
@@ -190,8 +191,8 @@ gageStackBlurParmCompare(const gageStackBlurParm *aa, const char *_nameA,
   for (si = 0; si < aa->num; si++) {
     if (aa->sigma[si] != bb->sigma[si]) {
       if (explain) {
-        sprintf(explain, "%s->sigma[%u]=%.17g != %s->sigma[%u]=%.17g", nameA, si,
-                aa->sigma[si], nameB, si, bb->sigma[si]);
+        snprintf(explain, ASL + 1, "%s->sigma[%u]=%.17g != %s->sigma[%u]=%.17g", nameA,
+                 si, aa->sigma[si], nameB, si, bb->sigma[si]);
       }
       *differ = 1;
       return 0;
@@ -203,7 +204,8 @@ gageStackBlurParmCompare(const gageStackBlurParm *aa, const char *_nameA,
   }
   if (*differ) {
     if (explain) {
-      sprintf(explain, "kernel specs different: %s", subexplain);
+      snprintf(explain, ASL + 1, "kernel specs different: %s",
+               airStrunc(subexplain, ASL + 1, 30));
     }
     *differ = 1;
     return 0;
@@ -214,13 +216,15 @@ gageStackBlurParmCompare(const gageStackBlurParm *aa, const char *_nameA,
   }
   if (*differ) {
     if (explain) {
-      sprintf(explain, "boundary specs different: %s", subexplain);
+      snprintf(explain, ASL + 1, "boundary specs different: %s",
+               airStrunc(subexplain, ASL + 1, 30));
     }
     *differ = 1;
     return 0;
   }
   /* no differences so far */
   *differ = 0;
+#undef ASL
   return 0;
 }
 
