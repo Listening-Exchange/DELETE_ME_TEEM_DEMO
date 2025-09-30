@@ -1274,6 +1274,10 @@ hestParse(hestOpt *opt, int _argc, const char **_argv, char **errP,
   hestParm *hparm;
 
   optNum = hestOptNum(opt);
+  if (errP) {
+    /* initialize error string pointer */
+    *errP = NULL;
+  }
 
   /* -------- initialize the mop! */
   mop = airMopNew();
