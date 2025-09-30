@@ -43,7 +43,7 @@ typedef union {
 ** libraries.  Can manually check that this really does list all the airEnums
 ** with: (TEEM_LIB_LIST)
 
-grep "airEnum *" {air,hest,biff,nrrd,ell,moss,unrrdu,alan,tijk,gage,dye,bane,limn,echo,hoover,seek,ten,elf,pull,coil,push,mite}/?*.h | grep EXPORT | more
+grep "airEnum *" {air,biff,hest,nrrd,ell,moss,unrrdu,alan,tijk,gage,dye,bane,limn,echo,hoover,seek,ten,elf,pull,coil,push,mite}/?*.h | grep EXPORT | more
 
 ** (with the ? in "}/?*.h" to stop compiler warnings about / * inside comment)
 ** We could grep specifically for "const airEnum *const", but its also good to
@@ -66,12 +66,13 @@ meetAirEnumAll() {
 
   /* air */
   ADD(airEndian);
-  ADD(airBool);
   ADD(airFPClass_ae);
-
-  /* hest: no airEnums */
+  ADD(airBool);
 
   /* biff: no airEnums */
+
+  /* hest */
+  ADD(hestSource);
 
   /* nrrd */
   ADD(nrrdFormatType);
