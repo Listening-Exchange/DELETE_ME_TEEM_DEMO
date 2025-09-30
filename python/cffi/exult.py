@@ -54,15 +54,17 @@ _tlhdrs = {
     # ell: ellMacros.h does not add to ell API
 }
 # as of Teem v2 the per-library "experimental" notion is gone, which simplifies
-# how the libraries and their dependencies are declared
+# how the libraries and their dependencies are declared.  The info below should
+# be extracted from the per-library GNUmakefiles, ideally in an automated way,
+# but for now via:    grep Depends */GNUmakefile | grep -v bin/GNUmakefile
 _tldeps = {
     'air': [],  # (don't need airExistsConf.h)
-    'hest': ['air'],
     'biff': ['air'],
+    'hest': ['air', 'biff'],
     'nrrd': ['biff', 'hest', 'air'],
     'ell': ['nrrd', 'biff', 'air'],
     'moss': ['ell', 'nrrd', 'biff', 'hest', 'air'],
-    'unrrdu': ['nrrd', 'hest', 'biff', 'air'],
+    'unrrdu': ['moss', 'nrrd', 'hest', 'biff', 'air'],
     #      moss needed for linking (because of unu ilk) but not for declaring unrrdu API
     'alan': ['ell', 'nrrd', 'biff', 'air'],
     'tijk': ['ell', 'nrrd', 'air'],
@@ -70,18 +72,18 @@ _tldeps = {
     'dye': ['ell', 'biff', 'air'],
     #      may not actually need ell; implementation of dye needs ellMacros.h
     'bane': ['gage', 'unrrdu', 'nrrd', 'biff', 'air'],
-    'limn': ['gage', 'ell', 'unrrdu', 'nrrd', 'biff', 'hest', 'air'],
+    'limn': ['ell', 'unrrdu', 'nrrd', 'biff', 'hest', 'air'],
     'echo': ['limn', 'ell', 'nrrd', 'biff', 'air'],
     'hoover': ['limn', 'ell', 'nrrd', 'biff', 'air'],
     'seek': ['gage', 'limn', 'ell', 'nrrd', 'biff', 'hest', 'air'],
-    'ten': ['echo', 'limn', 'gage', 'dye', 'unrrdu', 'ell', 'nrrd', 'biff', 'air'],
+    'ten': ['echo', 'limn', 'gage', 'unrrdu', 'ell', 'nrrd', 'biff', 'air'],
     'elf': ['ten', 'tijk', 'limn', 'ell', 'nrrd', 'air'],
     'pull': ['ten', 'limn', 'gage', 'ell', 'nrrd', 'biff', 'hest', 'air'],
     'coil': ['ten', 'ell', 'nrrd', 'biff', 'air'],
     'push': ['ten', 'gage', 'ell', 'nrrd', 'biff', 'air'],
     'mite': ['ten', 'hoover', 'limn', 'gage', 'ell', 'nrrd', 'biff', 'air'],
     # fmt: off
-    'meet': [ 'air', 'hest', 'biff', 'nrrd', 'ell', 'moss', 'unrrdu', 'alan', 'tijk',
+    'meet': [ 'air', 'biff', 'hest', 'nrrd', 'ell', 'moss', 'unrrdu', 'alan', 'tijk',
               'gage', 'dye', 'bane', 'limn', 'echo', 'hoover', 'seek', 'ten', 'elf',
               'pull', 'coil', 'push', 'mite'],
     # fmt: on
