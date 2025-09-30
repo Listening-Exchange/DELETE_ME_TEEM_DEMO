@@ -19,25 +19,24 @@ The annotations are a one-line comment, always on the line with the function ret
 
 The single-space-separated words in the comment are, in order:
 
-### Required:
+#### Required:
 
 - `Biff:` : the information in this annotation has been manually verified or,
 - `Biff?` : this annotation automatically generated, and needs verification. `teem/src/\_util/scan-symbols.py -biff` _only_ produces `Biff?` annotations.
 
-### Optional:
+#### Optional:
 
 `(private)` : this function is private (as described above). Otherwise, from the qualifiers on the return type of the function (the same line as this annotation), `static` will mean that the function is static, while not having `static` (and absent `(private)`) means the function is declared in `lib.h` and intended for external linkage. Such "private" functions probably aren't even in a python wrapper, but the fact of being private is nice to record once known, since you can't tell by looking at a function definition where it has been declared. Despite the tendency, there is no requirement in Teem code that private function names start with a single `_` underscore.
 
-### Required:
+#### Required:
 
-- `<val>` : The return value `<val>` indicates a biff-reported error, i.e., if the function returns `<val>` then someone needs to retrieve the biff error message. `<val>` must not contain `|`, `:`, or whitespace, and cannot be `nope` or `maybe`. `<val>` is just a string (since it is in a comment), but hopfully it is parsable as the function return type (on this same line, before the comment containing
-  this annotation). Simple integers are easy, but it could get trickier: example returns (currently used in Teem) include NULL, EOF, AIR\*FALSE, AIR_NAN, UINT_MAX, Z_STREAM_ERROR, and nrrdField_unknown. The point is: be prepared to do some work if you're trying to parse and act on Biff annotations.
+- `<val>` : The return value `<val>` indicates a biff-reported error, i.e., if the function returns `<val>` then someone needs to retrieve the biff error message. `<val>` must not contain `|`, `:`, or whitespace, and cannot be `nope` or `maybe`. `<val>` is just a string (since it is in a comment), but hopfully it is parsable as the function return type (on this same line, before the comment containing this annotation). Simple integers are easy, but it could get trickier: example returns (currently used in Teem) include NULL, EOF, AIR\*FALSE, AIR_NAN, UINT_MAX, Z_STREAM_ERROR, and nrrdField_unknown. The point is: be prepared to do some work if you're trying to parse and act on Biff annotations.
 - or `<v1>|<v2>` : A return value of either `<v1>` or `<v2>` indicates an error has been recorded in `biff`
 - or `<v1>|<v2>|<v3>` : Error values are `<v1>` or `<v2>` or `<v3>` (and so on)
 - or `maybe:<N>:<val>` : This function uses something like `biffMaybeAddf()`, which may or may not set a biff error message, depending on the value of one of the function parameters (always called `useBiff`, as enforced by biff auto-scan). `useBiff` is the Nth function parameter, in the _1_-based numbering of the function parameters.
 - or `nope` : This function does not use `biff`. The function may usefully communicate something about how things went wrong by a returning one of some possible error return values, but that isn't documented here because it doesn't involve `biff`. (Why `nope`: it won't be confused for anything else, and GLK had just seen the excellent [movie of the same name](<https://en.wikipedia.org/wiki/Nope_(film)>))
 
-### Optional:
+#### Optional:
 
 `# <comments>` : anything after a `#` is ignored by an annotation parser
 
