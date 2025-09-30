@@ -66,7 +66,7 @@ main(int argc, const char **argv) {
   hestOptAdd(&hopt, "p", "pb pa", airTypeSize_t, 2, 2, pad, "0 0",
              "bytes of padding before, and after, the data segment "
              "in the written data");
-  hestOptAdd(&hopt, "ns", "bool", airTypeInt, 0, 0, &negskip, NULL,
+  hestOptAdd(&hopt, "ns", NULL, airTypeInt, 0, 0, &negskip, NULL,
              "skipping should be relative to end of file");
   hestOptAdd(&hopt, "pb", "print", airTypeUInt, 1, 1, &printbytes, "0",
              "bytes to print at beginning and end of data, to help "
