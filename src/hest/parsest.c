@@ -1446,6 +1446,20 @@ hestParse2(hestOpt *hopt, int argc, const char **argv, char **errP,
            HPARM->verbosity);
   }
 
+#if 0
+  { // checking on the private airEnums
+    char err[AIR_STRLEN_LARGE + 1];
+    static const airEnum *saenm[2] = {argst_ae, nast_ae};
+    for (uint ei = 0; ei < 2; ei++) {
+      if (airEnumCheck(err, saenm[ei])) {
+        fprintf(stderr, "%s: problem with enum \"%s\" (%u):\n%s", __func__,
+                saenm[ei]->name, ei, err);
+        exit(1);
+      }
+    }
+  }
+#endif
+
   // error string song and dance
 #define DO_ERR(WUT)                                                                     \
   biffAddf(HEST, "%s%s" WUT, _MEV_(HPARM->verbosity));                                  \
