@@ -223,12 +223,12 @@ typedef struct {
                         and informs the later action of hestOptFree */
   airArray *parseMop; /* If non-NULL: remembers what was allocated at or behind *valueP
                          as a result of running hestParse(). Free'ing or destroy'ing
-                         callbacks added here (by _hestParseSingle[type]) with
+                         callbacks are added here (by _hestParseSingle[type]) with
                          when=airMopAlways. With the 2025 rewrite, this replaces the
                          previous `int alloc` field with special values 0,1,2,3, which
                          had fussy semantics that complicated hestParseFree()'s work.
-                         Now hestParseFree just calls airMopDone on all these (non-NULL)
-                         per-option parseMops. */
+                         Now hestParseFree just calls airMopDone on all these per-option
+                         parseMops (when non-NULL) */
   hestArgVec *havec;  // the (non-flag) parm args attributed to this option
   /* Since hest's beginning in 2002, the basic container for a set of options was an
   array of hestOpt structs (not pointers to them, which rules out argv-style
