@@ -85,6 +85,7 @@ main(int argc, const char **argv) {
     char vbuff[AIR_STRLEN_LARGE + 1];
     airTeemVersionSprint(vbuff);
     printf("%s\n", vbuff);
+    airMopOkay(mop);
     exit(0);
   }
   /* else, we should see if they're asking for a command we know about */
