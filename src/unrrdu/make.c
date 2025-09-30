@@ -421,7 +421,7 @@ unrrdu_makeMain(int argc, const char **argv, const char *me, hestParm *hparm) {
   if (airStrlen(content)) {
     nrrd->content = airStrdup(content);
   }
-  if (kvpLen) {
+  if (airStrlen(kvp[0])) {
     for (ii = 0; ii < kvpLen; ii++) {
       /* a hack: have to use NrrdIoState->line as the channel to communicate
          the key/value pair, since we have to emulate it having been
