@@ -93,7 +93,8 @@ parseSingleB(void *_out, const char *str, _hestPPair *hpp) {
   if (!(out && str && hpp)) return 1;                                                   \
   int ret = (1 != airSingleSscanf(str, format, out));                                   \
   if (ret) {                                                                            \
-    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldn't parse \"%s\" as", typstr);        \
+    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldn't parse \"%s\" as %s", str,         \
+             typstr);                                                                   \
   } else {                                                                              \
     hpp->err[0] = '\0';                                                                 \
   }                                                                                     \
