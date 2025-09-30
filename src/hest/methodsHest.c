@@ -80,8 +80,8 @@ parseSingleB(void *_out, const char *str, _hestPPair *hpp) {
   *out = airEnumVal(airBool, str);
   int ret = airEnumUnknown(airBool) /* which is -1 */ == *out;
   if (ret) {
-    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldnt parse \"%s\" as %s", str,
-             airBool->name);
+    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldnt parse \"%s\" (from %s) as %s", str,
+             airEnumStr(hestSource, hpp->hopt->source), airBool->name);
   } else {
     hpp->err[0] = '\0';
   }
@@ -93,8 +93,8 @@ parseSingleB(void *_out, const char *str, _hestPPair *hpp) {
   if (!(out && str && hpp)) return 1;                                                   \
   int ret = (1 != airSingleSscanf(str, format, out));                                   \
   if (ret) {                                                                            \
-    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldn't parse \"%s\" as %s", str,         \
-             typstr);                                                                   \
+    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldn't parse \"%s\" (from %s) as %s",    \
+             str, airEnumStr(hestSource, hpp->hopt->source), typstr);                   \
   } else {                                                                              \
     hpp->err[0] = '\0';                                                                 \
   }                                                                                     \
@@ -118,8 +118,8 @@ parseSingleC(void *_out, const char *str, _hestPPair *hpp) {
   int ret;
   if (1 != slen) {
     snprintf(hpp->err, AIR_STRLEN_HUGE + 1,
-             "expected single char but got string \"%s\" length %u", str,
-             AIR_UINT(slen));
+             "expected single char but got (from %s) string \"%s\" length %u",
+             airEnumStr(hestSource, hpp->hopt->source), str, AIR_UINT(slen));
     ret = 1;
   } else {
     char *out = (char *)_out;
@@ -151,8 +151,8 @@ parseSingleE(void *_out, const char *str, _hestPPair *hpp) {
   *out = airEnumVal(hpp->hopt->enm, str);
   int ret = (airEnumUnknown(hpp->hopt->enm) == *out);
   if (ret) {
-    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldn't parse \"%s\" as %s", str,
-             hpp->hopt->enm->name);
+    snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "couldn't parse \"%s\" (from %s) as %s", str,
+             airEnumStr(hestSource, hpp->hopt->source), hpp->hopt->enm->name);
   } else {
     hpp->err[0] = '\0';
   }
@@ -165,8 +165,9 @@ parseSingleO(void *out, const char *str, _hestPPair *hpp) {
   int ret = hpp->hopt->CB->parse(out, str, myerr);
   if (ret) {
     if (strlen(myerr)) {
-      snprintf(hpp->err, AIR_STRLEN_HUGE + 1, "error parsing \"%s\" as %s:\n%s\n", str,
-               hpp->hopt->CB->type,
+      snprintf(hpp->err, AIR_STRLEN_HUGE + 1,
+               "error parsing \"%s\" (from %s) as %s:\n%s\n", str,
+               airEnumStr(hestSource, hpp->hopt->source), hpp->hopt->CB->type,
                airStrunc(myerr, AIR_STRLEN_HUGE + 1,
                          strlen(str) + strlen(hpp->hopt->CB->type) + 100));
     } else {
