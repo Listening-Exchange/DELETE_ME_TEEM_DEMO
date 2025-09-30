@@ -36,11 +36,11 @@ main(int argc, const char **argv) {
   hparm->responseFileEnable = AIR_TRUE;
   hparm->verbosity = 4;
 
-  /*
   int flag;
   hestOptAdd_Flag(&opt, "b,bingo", &flag, "a flag");
   int verb;
   hestOptAdd_1_Int(&opt, "v", "verb", &verb, "0", "verbosity");
+  /*
   int unpA[2];
   hestOptAdd_2_Int(&opt, NULL, "A A", unpA, NULL, "unflagged A");
 
@@ -73,6 +73,15 @@ main(int argc, const char **argv) {
                        "(e.g. space, time, 3-vector, 3D-masked-symmetric-matrix, "
                        "or \"none\" to signify no kind)",
                        &kindsLen);
+  double *off;
+  unsigned int offLen;
+  hestOptAdd_Nv_Double(&opt, "off,offset", "off0", 0, -1, &off, "",
+                       "For each axis, an offset or shift to the position (in index "
+                       "space) of the lower end of the sampling domain. "
+                       "Either -off can be used, or -min and -max "
+                       "together, or none of these (so that, by default, the full "
+                       "domain of the axis is resampled).",
+                       &offLen);
 
   char *err = NULL;
   if (hestParse2(opt, argc - 1, argv + 1, &err, hparm)) {
@@ -84,6 +93,9 @@ main(int argc, const char **argv) {
   } else {
     for (unsigned int ki = 0; ki < kindsLen; ki++) {
       printf("kind[%u] = |%s|\n", ki, kinds[ki]);
+    }
+    for (unsigned int ii = 0; ii < offLen; ii++) {
+      printf("off[%u] = %g\n", ii, off[ii]);
     }
     hestParseFree(opt);
     hestOptFree(opt);
