@@ -742,8 +742,8 @@ _hestOPCheck(const hestOpt *hopt, const hestParm *hparm) {
         biffAddf(HEST, "%s%sstrlen(opt[%u].flag) %u is too big", _ME_, opi, fslen);
         return 1;
       }
-      if (strchr(flag, '-')) {
-        biffAddf(HEST, "%s%sopt[%u].flag \"%s\" contains '-', which will confuse things",
+      if ('-' == flag[0]) {
+        biffAddf(HEST, "%s%sopt[%u].flag \"%s\" starts with '-', which is confusing",
                  _ME_, opi, flag);
         return 1;
       }
@@ -772,18 +772,25 @@ _hestOPCheck(const hestOpt *hopt, const hestParm *hparm) {
                    _ME_, tbuff, sep + 1, opi);
           return (free(tbuff), 1);
         }
-        if (hparm->respectDashDashHelp && !strcmp("help", sep + 1)) {
-          biffAddf(HEST,
-                   "%s%slong \"--%s\" flag of opt[%u] is same as \"--help\" "
-                   "that requested hparm->respectDashDashHelp handles separately",
-                   _ME_, sep + 1, opi);
-          return (free(tbuff), 1);
-        }
         if (strchr(sep + 1, MULTI_FLAG_SEP)) {
           biffAddf(HEST,
                    "%s%sopt[%u] flag string \"%s\" has more than one instance of "
                    "short/long separation character '%c'",
                    _ME_, opi, flag, MULTI_FLAG_SEP);
+          return (free(tbuff), 1);
+        }
+        if ('-' == (sep + 1)[0]) {
+          biffAddf(HEST,
+                   "%s%slong flag \"%s\" (part of \"%s\") of opt[%u] starts with '-', "
+                   "which is confusing",
+                   _ME_, sep + 1, flag, opi);
+          return 1;
+        }
+        if (hparm->respectDashDashHelp && !strcmp("help", sep + 1)) {
+          biffAddf(HEST,
+                   "%s%slong \"--%s\" flag of opt[%u] is same as \"--help\" "
+                   "that requested hparm->respectDashDashHelp handles separately",
+                   _ME_, sep + 1, opi);
           return (free(tbuff), 1);
         }
       } else {
