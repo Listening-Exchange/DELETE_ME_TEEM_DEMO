@@ -62,18 +62,29 @@ main(int argc, const char **argv) {
   unsigned int sawC;
   hestOptAdd_Nv_Int(&opt, NULL, "C C", 1, 2, &unpC, NULL, "unflagged C", &sawC);
   */
+  char **kinds;
+  unsigned int kindsLen;
+  hestOptAdd_Nv_String(&opt, "k,kind", "k0 k1", 1, -1, &kinds, "boo",
+                       "what \"kind\" is each axis, from the nrrdKind airEnum "
+                       "(e.g. space, time, 3-vector, 3D-masked-symmetric-matrix, "
+                       "or \"none\" to signify no kind)",
+                       &kindsLen);
+
   char *err = NULL;
   if (hestParse2(opt, argc - 1, argv + 1, &err, hparm)) {
     fprintf(stderr, "%s: problem:\n%s\n", argv[0], err);
     free(err);
     ret = 1;
-  }
-  if (opt->helpWanted) {
-    printf("\n\n%s: help wanted!\n\n\n", argv[0]);
-  }
+  } else {
+    if (opt->helpWanted) {
+      printf("\n\n%s: help wanted!\n\n\n", argv[0]);
+    }
+    for (unsigned int ki = 0; ki < kindsLen; ki++) {
+      printf("kind[%u] = |%s|\n", ki, kinds[ki]);
+    }
 
-  hestOptFree(opt);
-  hestParmFree(hparm);
-
+    hestOptFree(opt);
+    hestParmFree(hparm);
+  }
   exit(ret);
 }
