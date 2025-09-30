@@ -162,6 +162,9 @@ static int
 parseSingleO(void *out, const char *str, _hestPPair *hpp) {
   if (!(out && str && hpp)) return 1;
   char myerr[AIR_STRLEN_HUGE + 1];
+  /* important to return this value; it has been part of hestParse() behavior
+  for a long time. e.g. hestCB *nrrdHestNrrd->parse() returns 2 if nrrdLoad()
+  fails with an error message mentioning "EOF", but returns 1 otherwise */
   int ret = hpp->hopt->CB->parse(out, str, myerr);
   if (ret) {
     if (strlen(myerr)) {

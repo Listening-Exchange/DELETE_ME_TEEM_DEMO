@@ -1258,6 +1258,7 @@ optSetValues(hestOpt *hopt, const hestParm *hparm) {
   void *valueP;
   uint optNum = hopt->arrLen;
   for (uint opi = 0; opi < optNum; opi++) {
+    int pret;
     identStr(ident, hopt + opi);
     // hopt[opi].source has already been set
     /* 2023 GLK notes that r6388 2020-05-14 GLK was asking:
@@ -1339,10 +1340,10 @@ optSetValues(hestOpt *hopt, const hestParm *hparm) {
                  hopt[opi].havec->len);
         return 1;
       }
-      if (_hestParseSingle[type](valueP, strsrc, hpp)) {
+      if ((pret = _hestParseSingle[type](valueP, strsrc, hpp))) {
         biffAddf(HEST, "%s%sfor (kind 4) %s[%u] could not parse |%s| as single %s", _ME_,
                  ident, opi, strsrc, _hestTypeStr[type]);
-        return 1;
+        return pret;
       }
       if (invert) {
         _hestInvertScalar[type](valueP);
@@ -1352,21 +1353,21 @@ optSetValues(hestOpt *hopt, const hestParm *hparm) {
     } // end case 4 {
     break;
     case 2: // -------- one required parameter --------
-      if (_hestParseSingle[type](valueP, hopt[opi].havec->harg[0]->str, hpp)) {
+      if ((pret = _hestParseSingle[type](valueP, hopt[opi].havec->harg[0]->str, hpp))) {
         biffAddf(HEST, "%s%sproblem parsing for (kind 2) %s[%u] (from %s): %s", _ME_,
                  ident, opi, airEnumStr(hestSource, hopt[opi].source), hpp->err);
-        return 1;
+        return pret;
       }
       break;
     case 3: { // -------- multiple required parameters --------
       // user already allocated array at valueP
       char *cvalueP = (char *)valueP;
       for (uint argi = 0; argi < hopt[opi].havec->len; argi++) {
-        if (_hestParseSingle[type](cvalueP + size * argi,
-                                   hopt[opi].havec->harg[argi]->str, hpp)) {
+        if ((pret = _hestParseSingle[type](cvalueP + size * argi,
+                                           hopt[opi].havec->harg[argi]->str, hpp))) {
           biffAddf(HEST, "%s%sproblem parsing arg %u (of %u) for (kind 3) %s[%u]: %s",
                    _ME_, argi, hopt[opi].havec->len, ident, opi, hpp->err);
-          return 1;
+          return pret;
         }
       }
     } break;
@@ -1416,11 +1417,11 @@ optSetValues(hestOpt *hopt, const hestParm *hparm) {
       char *cvalueP = *((void **)valueP);
       // (RIP hammerhead.ucsd.edu, Intel Itanium, and last days of grad school)
       for (uint argi = 0; argi < hopt[opi].havec->len; argi++) {
-        if (_hestParseSingle[type](cvalueP + size * argi,
-                                   hopt[opi].havec->harg[argi]->str, hpp)) {
+        if ((pret = _hestParseSingle[type](cvalueP + size * argi,
+                                           hopt[opi].havec->harg[argi]->str, hpp))) {
           biffAddf(HEST, "%s%sproblem parsing arg %u (of %u) for (kind 5) %s[%u]: %s",
                    _ME_, argi, hopt[opi].havec->len, ident, opi, hpp->err);
-          return 1;
+          return pret;
         }
       }
       if (airTypeString == type) {
@@ -1445,8 +1446,9 @@ error, an error message string describing it in detail is generated and
 The basic phases of parsing are:
 
 1) Error checking on given `hopt` array.  If this fails (i.e. because the previous
-calls to hestOptAdd were malformed), the return is 2, not the 1 returned from errors in
-any of the subsequent steps.
+calls to hestOptAdd were malformed), the return is -1, not the 1 returned from errors in
+most of the subsequent steps (the exception is optSetValues; its non-zero return value is
+returned from here).
 
 2) Generate internal representation of command-line that includes expanding any
 response files; this all goes into the `hestArgVec *havec`.
@@ -1466,7 +1468,7 @@ int
 hestParse2(hestOpt *hopt, int argc, const char **argv, char **errP,
            const hestParm *_hparm) {
   airArray *mop = airMopNew(); // initialize the mop
-
+  int pret;
   // make exactly one of (given) _hparm and (our) hparm non-NULL
   hestParm *hparm = NULL;
   if (!_hparm) {
@@ -1509,7 +1511,7 @@ hestParse2(hestOpt *hopt, int argc, const char **argv, char **errP,
   if (_hestOPCheck(hopt, HPARM)) {
     DO_ERR("problem with given hestOpt array");
     airMopError(mop);
-    return 2;
+    return -1;
   }
   if (HPARM->verbosity > 1) {
     printf("%s: _hestOPCheck passed\n", __func__);
@@ -1565,10 +1567,10 @@ hestParse2(hestOpt *hopt, int argc, const char **argv, char **errP,
   }
 
   // --6--6--6--6--6-- Finally, parse the args and set values
-  if (optSetValues(hopt, HPARM)) {
-    DO_ERR("problem with setting values");
+  if ((pret = optSetValues(hopt, HPARM))) {
+    DO_ERR("problem with parsing and setting values");
     airMopError(mop);
-    return 1;
+    return pret;
   }
 
 #undef DO_ERR
