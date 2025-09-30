@@ -263,14 +263,14 @@ endif()
 
 # set the Teem library as a list (TEEM_LIB_LIST)
 set(Teem_LIBRARIES
-    "air" "hest" "biff" "nrrd" "ell" "moss" "unrrdu" "alan" "tijk" "gage" "dye"
+    "air" "biff" "hest" "nrrd" "ell" "moss" "unrrdu" "alan" "tijk" "gage" "dye"
     "bane" "limn" "echo" "hoover" "seek" "ten" "elf" "pull" "coil" "push" "mite" "meet")
 
 # set the Teem headers as a list
 set(Teem_HEADER_FILES
     "air/air.h"
-    "hest/hest.h"
     "biff/biff.h"
+    "hest/hest.h"
     "nrrd/nrrd.h"   "nrrd/nrrdDefines.h"   "nrrd/nrrdMacros.h"  "nrrd/nrrdEnums.h"
     "ell/ell.h"     "ell/ellMacros.h"
     "moss/moss.h"
