@@ -42,7 +42,7 @@ $(L).Included := yes
 #### Describe library L here
 ####
 ####
-$(L).Depends = air biff ell nrrd
+$(L).Depends = nrrd ell biff air
 $(L).PublicHdr = alan.h
 $(L).PrivateHdr =
 $(L).Obj = $(patsubst %.c,%.o, \

@@ -43,7 +43,7 @@ $(L).Included := yes
 ####
 ####
 # TEEM_LIB_LIST (except meet)
-$(L).Depends = air hest biff nrrd ell moss unrrdu alan tijk gage dye bane limn echo hoover seek ten elf pull coil push mite
+$(L).Depends = air biff hest nrrd ell moss unrrdu alan tijk gage dye bane limn echo hoover seek ten elf pull coil push mite
 $(L).PublicHdr = meet.h
 $(L).PrivateHdr =
 $(L).Obj = $(patsubst %.c,%.o, \
