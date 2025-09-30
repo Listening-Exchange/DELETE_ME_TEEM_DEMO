@@ -1220,6 +1220,10 @@ optProcessDefaults(hestOpt *hopt, hestArg *tharg, hestInputStack *hist,
   }
   for (uint opi = 0; opi < optNum; opi++) {
     identStr(ident, hopt + opi);
+    if (hestSourceUnknown == hopt[opi].source) {
+      biffAddf(HEST, "%s%s%s[%u] does not have a source set?", _ME_, ident, opi);
+      return 1;
+    }
     /* (Yes, half of this test is redundant with check above on whether the default
     string supplied at least hopt[opi].min args, but erring with doing more checks).
     Now that we've made a hopt[opi].havec array, and will soon parse strings to set
