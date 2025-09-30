@@ -1353,8 +1353,8 @@ optSetValues(hestOpt *hopt, const hestParm *hparm) {
     break;
     case 2: // -------- one required parameter --------
       if (_hestParseSingle[type](valueP, hopt[opi].havec->harg[0]->str, hpp)) {
-        biffAddf(HEST, "%s%sproblem parsing for (kind 2) %s[%u]: %s", _ME_, ident, opi,
-                 hpp->err);
+        biffAddf(HEST, "%s%sproblem parsing for (kind 2) %s[%u] (from %s): %s", _ME_,
+                 ident, opi, airEnumStr(hestSource, hopt[opi].source), hpp->err);
         return 1;
       }
       break;
@@ -1381,7 +1381,32 @@ optSetValues(hestOpt *hopt, const hestParm *hparm) {
         *((void **)valueP) = calloc(hopt[opi].havec->len + 1, size);
       } else if (hopt[opi].havec->len) {
         // only allocate if there's a need to
-        *((void **)valueP) = calloc(hopt[opi].havec->len, size);
+        if (1 == hopt[opi].havec->len                     //
+            && !strcmp("", hopt[opi].havec->harg[0]->str) //
+            && hestSourceDefault == hopt[opi].source      //
+            && 0 == hopt[opi].min) {
+          if (hparm->verbosity) {
+            /* An established hest idiom (certainly used by unu, e.g. unu resample -off)
+            for non-string-type variadic options with min=0, is to give a default as the
+            "" empty string to mean: 0 values. In the old (pre-2025) code based on
+            strtok: strtok would look at "" and see zero tokens and say: 0 values.  The
+            new code sees "" as one arg, dutifully saved to the per-option havec, and
+            then we would (below) try to parse "" as some type (e.g. double), which isn't
+            intended.  So here is where we make the idiom work again: if the per-option
+            havec is just a single empty string that came from the default, and this is a
+            non-string variadic option with min=0, then we pretend like we never saw any
+            args, and reset per-option havec to length 0. */
+            printf(
+              "%s: (kind 5) %s[%u] (type=%s min=0) default single arg==empty-string "
+              "treated as 0 args\n",
+              __func__, ident, opi, _hestTypeStr[hopt[opi].type]);
+          }
+          hestArgVecReset(hopt[opi].havec);
+        }
+        // yea, so, like we were saying: only allocate if there's a need to
+        if (hopt[opi].havec->len) {
+          *((void **)valueP) = calloc(hopt[opi].havec->len, size);
+        }
       }
       if (*((void **)valueP)) {
         if (!hopt[opi].parseMop) hopt[opi].parseMop = airMopNew();
