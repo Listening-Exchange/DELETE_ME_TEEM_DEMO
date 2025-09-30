@@ -23,9 +23,11 @@
 #define INFO "Configuration and platform parameters of this \"unu\""
 static const char *_unrrdu_builtInfoL
   = (INFO ". Not every configuration/compilation choice made when building Teem "
-          " matters for nrrd and the other libraries that \"unu\" depends on; "
-          "see output of \"XXXX HEY WUT? XXXX\" for a view of those. "
-          "This documents things visible to \"unu\".");
+          "matters for nrrd and the other libraries that \"unu\" depends on. "
+          "The CMake-generated teem-install/lib/pkgconfig/teem.pc and "
+          "teem-install/bin/teem-config offer a more complete account of "
+          "what this (whole) Teem build depends on. "
+          "This command only documents things visible to \"unu\".");
 
 static int
 unrrdu_builtMain(int argc, const char **argv, const char *me, hestParm *hparm) {
