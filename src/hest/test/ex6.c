@@ -95,7 +95,8 @@ main(int argc, const char **argv) {
   short h1v;
   hestOptAdd_1v_Short(&opt, "h1v", "short1", &h1v, "42", "test of hestOptAdd_1v_Short");
   unsigned short uh1v;
-  hestOptAdd_1v_UShort(&opt, "uh1v", "ushort1", &uh1v, "42", "test of hestOptAdd_1v_UShort");
+  hestOptAdd_1v_UShort(&opt, "uh1v", "ushort1", &uh1v, "42",
+                       "test of hestOptAdd_1v_UShort");
   int i1v;
   hestOptAdd_1v_Int(&opt, "i1v", "int1", &i1v, "42", "test of hestOptAdd_1v_Int");
   unsigned int ui1v;
@@ -103,8 +104,7 @@ main(int argc, const char **argv) {
   long int l1v;
   hestOptAdd_1v_Long(&opt, "l1v", "lnt1", &l1v, "42", "test of hestOptAdd_1v_Long");
   unsigned long int ul1v;
-  hestOptAdd_1v_ULong(&opt, "ul1v", "ulnt1", &ul1v, "42",
-                      "test of hestOptAdd_1v_ULong");
+  hestOptAdd_1v_ULong(&opt, "ul1v", "ulnt1", &ul1v, "42", "test of hestOptAdd_1v_ULong");
   size_t sz1v;
   hestOptAdd_1v_Size_t(&opt, "sz1v", "size1", &sz1v, "42",
                        "test of hestOptAdd_1v_Size_t");
@@ -170,18 +170,18 @@ main(int argc, const char **argv) {
   hestOptAdd_2_Bool(&opt, "b2", "bool1 bool2", b2, "true false",
                     "test of hestOptAdd_2_Bool");
   short h2[2];
-  hestOptAdd_2_Short(&opt, "h2", "short1 short2", h2, "42 24", "test of hestOptAdd_2_Short");
+  hestOptAdd_2_Short(&opt, "h2", "short1 short2", h2, "42 24",
+                     "test of hestOptAdd_2_Short");
   unsigned short uh2[2];
   hestOptAdd_2_UShort(&opt, "uh2", "ushort1 ushort2", uh2, "42 24",
-                    "test of hestOptAdd_2_UShort");
+                      "test of hestOptAdd_2_UShort");
   int i2[2];
   hestOptAdd_2_Int(&opt, "i2", "int1 int2", i2, "42 24", "test of hestOptAdd_2_Int");
   unsigned int ui2[2];
   hestOptAdd_2_UInt(&opt, "ui2", "uint1 uint2", ui2, "42 24",
                     "test of hestOptAdd_2_UInt");
   long int l2[2];
-  hestOptAdd_2_Long(&opt, "l2", "long1 long2", l2, "42 24",
-                    "test of hestOptAdd_2_Long");
+  hestOptAdd_2_Long(&opt, "l2", "long1 long2", l2, "42 24", "test of hestOptAdd_2_Long");
   unsigned long int ul2[2];
   hestOptAdd_2_ULong(&opt, "ul2", "ulong1 ulong2", ul2, "42 24",
                      "test of hestOptAdd_2_ULong");
@@ -214,10 +214,10 @@ main(int argc, const char **argv) {
                     "test of hestOptAdd_3_Bool");
   short h3[3];
   hestOptAdd_3_Short(&opt, "h3", "short1 short2 short3", h3, "43 3 34",
-                   "test of hestOptAdd_3_Short");
+                     "test of hestOptAdd_3_Short");
   unsigned short uh3[3];
   hestOptAdd_3_UShort(&opt, "uh3", "ushort1 ushort2 ushort3", uh3, "43 3 34",
-                    "test of hestOptAdd_3_UShort");
+                      "test of hestOptAdd_3_UShort");
   int i3[3];
   hestOptAdd_3_Int(&opt, "i3", "int1 int2 int3", i3, "43 3 34",
                    "test of hestOptAdd_3_Int");
@@ -307,8 +307,8 @@ main(int argc, const char **argv) {
   hestOptAdd_N_UInt(&opt, "ui5", "uint1 uint2 uint3 uint4 uint5", 5, ui5,
                     "55 5 33 500 55", "test of hestOptAdd_N_UInt");
   long int l5[5];
-  hestOptAdd_N_Long(&opt, "l5", "long1 long2 long3 long4 long5", 5, l5,
-                    "55 5 33 500 55", "test of hestOptAdd_N_Long");
+  hestOptAdd_N_Long(&opt, "l5", "long1 long2 long3 long4 long5", 5, l5, "55 5 33 500 55",
+                    "test of hestOptAdd_N_Long");
   unsigned long int ul5[5];
   hestOptAdd_N_ULong(&opt, "ul5", "ulong1 ulong2 ulong3 ulong4 ulong5", 5, ul5,
                      "55 5 33 500 55", "test of hestOptAdd_N_ULong");
@@ -340,8 +340,8 @@ main(int argc, const char **argv) {
                      "15.55  55.51  66.77  88.99  100.2", "test of hestOptAdd_N_Other B",
                      &quatCB);
 
-// HEY try both!
-// #define VMIN 0
+  // HEY try both!
+  // #define VMIN 0
 #define VMIN 1
   int *bv;
   unsigned int bvSaw;
