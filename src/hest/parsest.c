@@ -1385,17 +1385,17 @@ optSetValues(hestOpt *hopt, const hestParm *hparm) {
             && !strcmp("", hopt[opi].havec->harg[0]->str) //
             && hestSourceDefault == hopt[opi].source      //
             && 0 == hopt[opi].min) {
+          /* An established hest idiom (certainly used by unu, e.g. unu resample -off)
+          for non-string-type variadic options with min=0, is to give a default as the
+          "" empty string to mean: 0 values. In the old (pre-2025) code based on
+          strtok: strtok would look at "" and see zero tokens and say: 0 values.  The
+          new code sees "" as one arg, dutifully saved to the per-option havec, and
+          then we would (below) try to parse "" as some type (e.g. double), which isn't
+          intended. So here is where we make the idiom work again: if the per-option
+          havec is just a single empty string that came from the default, and this is a
+          non-string variadic option with min=0, then we pretend like we never saw any
+          args, and reset per-option havec to length 0. */
           if (hparm->verbosity) {
-            /* An established hest idiom (certainly used by unu, e.g. unu resample -off)
-            for non-string-type variadic options with min=0, is to give a default as the
-            "" empty string to mean: 0 values. In the old (pre-2025) code based on
-            strtok: strtok would look at "" and see zero tokens and say: 0 values.  The
-            new code sees "" as one arg, dutifully saved to the per-option havec, and
-            then we would (below) try to parse "" as some type (e.g. double), which isn't
-            intended.  So here is where we make the idiom work again: if the per-option
-            havec is just a single empty string that came from the default, and this is a
-            non-string variadic option with min=0, then we pretend like we never saw any
-            args, and reset per-option havec to length 0. */
             printf(
               "%s: (kind 5) %s[%u] (type=%s min=0) default single arg==empty-string "
               "treated as 0 args\n",
