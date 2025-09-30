@@ -75,14 +75,13 @@ main(int argc, const char **argv) {
     fprintf(stderr, "%s: problem:\n%s\n", argv[0], err);
     free(err);
     ret = 1;
+  } else if (opt->helpWanted) {
+    printf("\n\n%s: help wanted!\n\n\n", argv[0]);
   } else {
-    if (opt->helpWanted) {
-      printf("\n\n%s: help wanted!\n\n\n", argv[0]);
-    }
     for (unsigned int ki = 0; ki < kindsLen; ki++) {
       printf("kind[%u] = |%s|\n", ki, kinds[ki]);
     }
-
+    hestParseFree(opt);
     hestOptFree(opt);
     hestParmFree(hparm);
   }
