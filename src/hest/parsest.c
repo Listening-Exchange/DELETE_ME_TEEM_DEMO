@@ -138,15 +138,18 @@ argstGo(int *nastP, hestArg *tharg, int *stateP, int icc, int vrbo) {
   if (EOF == icc) {
     int ret;
     switch (*stateP) {
+    case argstInside:
     case argstStart:
-    case argstComment:
-      // oh well, we didn't get to start an arg
-      *nastP = nastTryAgain; // input will be popped, try again with next stack element
+      /* EOF ends the arg we're argstInside (which is fine), or it ends the arg we're
+         just argstStart'ing, and that's fine too: it's how to get an empty string arg,
+         which is a legit arg (e.g. unu make -k <kind> default is "" for single empty
+         string; the mishandling of that triggered the 2025 hest re-write) */
+      *nastP = nastBehold;
       ret = 0;
       break;
-    case argstInside:
-      // the EOF ends the arg and that's ok
-      *nastP = nastBehold;
+    case argstComment:
+      /* hit EOF will inside a #-comment, which is totally fine, move along ... */
+      *nastP = nastTryAgain;
       ret = 0;
       break;
     case argstSingleQ:
@@ -338,6 +341,8 @@ histProcNextArgTry(int *nastP, hestArg *tharg, hestInputStack *hist,
         }
         return 1;
       }
+      /* printf("!%s: icc = %d --> argstGo --> *nastP = %s; tharg:|%s|\n", __func__, icc,
+                airEnumStr(nast_ae, *nastP), tharg->str); */
       if (EOF != icc) {
         hin->carIdx++;
       } else {
@@ -372,7 +377,7 @@ histProcNextArg(int *nastP, hestArg *tharg, hestInputStack *hist,
       return 1;
     }
     if (hparm->verbosity > 1) {
-      printf("%s: histProcNextArgSub set *nastP = %s\n", __func__,
+      printf("%s: histProcNextArgTry set *nastP = %s\n", __func__,
              airEnumStr(nast_ae, *nastP));
     }
   } while (*nastP == nastTryAgain);
@@ -553,7 +558,7 @@ histProcess(hestArgVec *havec, int *helpWantedP, hestArg *tharg, hestInputStack 
                 ? hist->hin + hist->len - 1
                 : NULL);
     // printf("!%s: nast = %s, |stack| = %u, topHin = %p\n", __func__,
-    //        airEnumStr(nast_ae, nast), hist->len, AIR_VOIDP(topHin));
+    //         airEnumStr(nast_ae, nast), hist->len, AIR_VOIDP(topHin));
     //  we have a token, is it turning off commenting?
     if (hparm->respectDashBraceComments && !strcmp("}-", tharg->str)) {
       if (!topHin) {
@@ -1197,6 +1202,8 @@ optProcessDefaults(hestOpt *hopt, hestArg *tharg, hestInputStack *hist,
       printf("%s: looking at %s[%u] default string |%s|\n", __func__, ident, opi,
              hopt[opi].dflt);
     }
+    /* printf("!%s: hopt[%u].havec %p   havec->len = %u\n", __func__, opi,
+       hopt[opi].havec, hopt[opi].havec->len); */
     if (histPushDefault(hist, hopt[opi].dflt, hparm)
         || histProcess(hopt[opi].havec, NULL, tharg, hist, hparm)) {
       biffAddf(HEST, "%s%sproblem tokenizing %s[%u] default string", _ME_, ident, opi);

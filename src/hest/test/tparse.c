@@ -36,6 +36,7 @@ main(int argc, const char **argv) {
   hparm->responseFileEnable = AIR_TRUE;
   hparm->verbosity = 4;
 
+  /*
   int flag;
   hestOptAdd_Flag(&opt, "b,bingo", &flag, "a flag");
   int verb;
@@ -47,6 +48,7 @@ main(int argc, const char **argv) {
   unsigned int slen;
   hestOptAdd_Nv_Int(&opt, "s,sizes", "sx sy", 2, -1, &size, NULL, "image resolutions",
                     &slen);
+                    */
 #if 0
   int *unpB;
   unsigned int sawB;
@@ -55,8 +57,10 @@ main(int argc, const char **argv) {
 #endif
   /* int unpB[2];
      hestOptAdd_2_Int(&opt, NULL, "B B", unpB, NULL, "unflagged B"); */
+#if 0
   int unpC[2];
   hestOptAdd_2_Int(&opt, NULL, "C C", unpC, /* "dfltC0 dfltC1" */ NULL, "unflagged C");
+#endif
   /*
   int *unpC;
   unsigned int sawC;
@@ -64,7 +68,7 @@ main(int argc, const char **argv) {
   */
   char **kinds;
   unsigned int kindsLen;
-  hestOptAdd_Nv_String(&opt, "k,kind", "k0 k1", 1, -1, &kinds, "boo",
+  hestOptAdd_Nv_String(&opt, "k,kind", "k0 k1", 1, -1, &kinds, "",
                        "what \"kind\" is each axis, from the nrrdKind airEnum "
                        "(e.g. space, time, 3-vector, 3D-masked-symmetric-matrix, "
                        "or \"none\" to signify no kind)",
