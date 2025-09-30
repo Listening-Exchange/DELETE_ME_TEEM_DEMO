@@ -49,7 +49,7 @@ else:
 
 verbose = 1
 LIB = None   # which library is being scanned
-archDir = None
+builtDir = None
 libDir = None
 srcLines = {}   # maps from filename to (list of) lines of code, either from disk or modified
 modified = {}   # maps from filename to how many srcLines have been modified
@@ -100,6 +100,10 @@ allTypes = sorted(
         'airThreadBarrier',
         'airJSFRand',
         'biffMsg',
+        'hestArg',
+        'hestArgVec',
+        'hestInput',
+        'hestInputStack',
         'hestCB',
         'hestParm',
         'hestOpt',
@@ -330,9 +334,8 @@ def symbList(lib, firstClean):
     if firstClean:
         runthis('make clean', False)
     runthis('make', False)
-    runthis('make install', False)
     # HEY HEY this depends on "nm" being llvm-nm
-    nmOut = runthis(f'nm {archDir}/lib/lib{lib}.a', True).stdout.decode('UTF-8').splitlines()
+    nmOut = runthis(f'nm {builtDir}/lib/lib{lib}.a', True).stdout.decode('UTF-8').splitlines()
     nmOut.pop(0)   # first line is empty (at least on Mac)
     # symb accumulates a dict mapping from symbol name to little description:
     # 'type': of the symbol, in the nm sense (not the C sense)
@@ -341,7 +344,7 @@ def symbList(lib, firstClean):
     currFile = None
     for L in nmOut:
         # if match := re.match(r'[^\()]+\(([^\)]+).o\):$', L): # old nm
-        if match := re.match(r'^([^\)]+).o:$', L): # new llvm-nm
+        if match := re.match(r'^([^\)]+).o:$', L):   # new llvm-nm
             currFile = match.group(1) + '.c'
             if verbose > 1:
                 print(f'   ... {currFile}')
@@ -365,7 +368,8 @@ def symbList(lib, firstClean):
         if dropUnder:   # (Mac)  (----- 1 -----)(- 2 -)  ( 3)
             match = re.match(r'([0-9a-fA-F]+ )([tTDS]) _(.*)$', L)
             if not match:
-                raise Exception(f'malformed (no leading underscore) "{L}" in {currFile}')
+                print(f'malformed (no leading underscore) "{L}" in {currFile}; ignoring ...')
+                continue
         else:   # not trying to drop leading underscore (not on Mac)
             #                  (----- 1 -----)(- 2 -) ( 3)
             match = re.match(r'([0-9a-fA-F]+ )([tTDS]) (.*)$', L)
@@ -436,6 +440,8 @@ def declList(lib):
         lines.remove('extern "C" {')
         # how thing intended for linkable visibility are are announced
         externStr = f'{LIB}_EXPORT ' if public else 'extern '
+        if verbose:
+            print(f' = = = = = looking at {HN=} {externStr=} ... ')
         for L in lines:
             origL = L
             # special handling of inside of list of nrrdKernels
@@ -443,11 +449,13 @@ def declList(lib):
                 L = 'NRRD_EXPORT const NrrdKernel' + kernelLineProc(L[1:])
             # does it looks like the start of a declaration?
             if L.startswith(externStr):
+                # print(f'{HN=} : {externStr=} {L=}')
                 # remove LIB_EXPORT or extern prefix
                 L = L.removeprefix(externStr)
                 if L == 'const NrrdKernel':
                     # its the start of a kernel list; each handled separately above
                     continue
+                # print(f'   ... {L=}')
                 # else (hackly) work on isolating the symbol name
                 # print(f'foo0 |{L}|')
                 for QT in allTypes:
@@ -728,16 +736,16 @@ def biffScan(funcName, fileName, funcKind):
 
 # check the two command-line arguments to this script
 def argsCheck(tPath, lib):
-    global archDir, libDir
+    global builtDir, libDir
     if not (
-        os.path.isdir(tPath) and os.path.isdir(f'{tPath}/arch') and os.path.isdir(f'{tPath}/src')
+        os.path.isdir(tPath) and os.path.isdir(f'{tPath}/built') and os.path.isdir(f'{tPath}/src')
     ):
-        raise Exception(f'Need {tPath} to be dir with "arch" and "src" subdirs')
+        raise Exception(f'Need {tPath} to be dir with "built" and "src" subdirs')
     if not os.path.isdir(f'{tPath}/src/{lib}'):
         raise Exception(f'Do not see library "{lib}" subdir in "src" subdir')
-    archDir = f'{tPath}/built'
-    if not os.path.isdir(archDir):
-        raise Exception(f'Do not see "{archDir}" subdir')
+    builtDir = f'{tPath}/built'
+    if not os.path.isdir(builtDir):
+        raise Exception(f'Do not see "{builtDir}" subdir')
     libDir = f'{tPath}/src/{lib}'
     if not os.path.isdir(libDir):
         raise Exception(f'Do not see "{libDir}" subdir for lib "{lib}"')
