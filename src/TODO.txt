@@ -1,11 +1,3 @@
-******* Figure out what is going on with parsing spaces in hest:
-this doesn't work:
-  unu basinfo -i tmp.nrrd -kv space:=RGB "novalue:=0.3 0 0" -o tmp2.nrrd
-and instead it sees:
-  !unu basinfo: kvpstring[0/2] = |space:=RGB|
-  !unu basinfo: kvpstring[1/2] = |"novalue:=0.3|
-where the hell is the " coming from?
-
 (Actually maybe ctypes is not important, now that the CFFI stuff is solid with exult.py)
    revisit ctypes with new ctypeslib2:
      https://github.com/trolldbois/ctypeslib
@@ -81,22 +73,6 @@ instead of with empty string "" (or allowing either NULL or "")
 The problem is that such a thing would have to be an argument
 to a great many functions (or else it itself would be a global),
 and then how do you know which functions should take it?
-
-hest:
-* consider renaming hestParmFree --> hestParmNix
-* air/hest: remove the airType* enum. The following sort of code looks
-correct but is completely wrong
-  if (nrrdAlloc(nout, airTypeFloat, 3, size[0], size[1], size[2])) { ...
-because "airTypeFloat" is there instead of "nrrdTypeFloat".  All
-things airType were created for the sake of hest. Instead of taking an
-airType enum value for hestOptAdd, hestOptAdd can take a string
-(e.g. "uchar", "float", "enum", "callback" for airTypeOther).
-* There's no such thing as a truly optional parameter: data is needed
-for all options, whether it comes from the default string or the
-command line, and its an error if no data is found.  Not having
-optional parameters is why things like "unu make" learn centerings via
-strings: the string can be given or not, and if its given, then the
-information is used.
 
 biff:
 * biffMove(destKey, err, srcKey) --> biffMove(destKey, srcKey, err)
