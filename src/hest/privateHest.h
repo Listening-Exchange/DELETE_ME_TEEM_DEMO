@@ -69,9 +69,9 @@ typedef unsigned int uint;
  * with a air --> _hest renaming, since these are only used to implement hest functions.
  */
 #define _HEST_TYPE_MAX 14
-HEST_EXPORT const char _hestTypeStr[_HEST_TYPE_MAX + 1][AIR_STRLEN_SMALL + 1];
-HEST_EXPORT const size_t _hestTypeSize[_HEST_TYPE_MAX + 1];
-HEST_EXPORT void (*const _hestInvertScalar[_HEST_TYPE_MAX + 1])(void *);
+extern const char _hestTypeStr[_HEST_TYPE_MAX + 1][AIR_STRLEN_SMALL + 1];
+extern const size_t _hestTypeSize[_HEST_TYPE_MAX + 1];
+extern void (*const _hestInvertScalar[_HEST_TYPE_MAX + 1])(void *);
 /* the _hestPPair (hest parse pair) struct is a 2025 idea for addressing one of the most
 annoying parts of hest's code: the special-casing of how values are parsed from strings,
 depending on type (scalar vs enum vs other-via-callbacks). Old code has long had nested
@@ -86,12 +86,12 @@ typedef struct {
   hestOpt *hopt;                 // what option is this for
   char err[AIR_STRLEN_HUGE + 1]; // error message can go for any type
 } _hestPPair;
-HEST_EXPORT int (*const _hestParseSingle[_HEST_TYPE_MAX + 1])(void *, const char *,
-                                                              _hestPPair *);
+extern int (*const _hestParseSingle[_HEST_TYPE_MAX + 1])(void *, const char *,
+                                                         _hestPPair *);
 // HEY these are sticking around just for the old implementation of hestParse
-HEST_EXPORT unsigned int (*const _hestParseStr[_HEST_TYPE_MAX + 1])(void *, const char *,
-                                                                    const char *,
-                                                                    unsigned int);
+extern unsigned int (*const _hestParseStr[_HEST_TYPE_MAX + 1])(void *, const char *,
+                                                               const char *,
+                                                               unsigned int);
 extern const char *const _hestBiffKey;
 extern int _hestMax(int max);
 extern int _hestOPCheck(const hestOpt *hopt, const hestParm *parm);

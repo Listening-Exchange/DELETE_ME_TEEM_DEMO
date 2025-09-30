@@ -208,7 +208,7 @@ _hestPlainWord(const char *s) {
 /* Assuming that `str` needs some quoting or ecaping to be retokenized as a single arg
 then figure out if that should be via single or double quoting, by doing both and picking
 the shorter one */
-void
+static void
 argAddQuotedString(hestArg *harg, const char *str) {
   hestArg *singQ = hestArgNew();
   hestArg *doubQ = hestArgNew();
