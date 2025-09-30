@@ -1444,20 +1444,20 @@ error, an error message string describing it in detail is generated and
 
 The basic phases of parsing are:
 
-0) Error checking on given `hopt` array.  If this fails (i.e. because the previous
+1) Error checking on given `hopt` array.  If this fails (i.e. because the previous
 calls to hestOptAdd were malformed), the return is 2, not the 1 returned from errors in
 any of the subsequent steps.
 
-1) Generate internal representation of command-line that includes expanding any
+2) Generate internal representation of command-line that includes expanding any
 response files; this all goes into the `hestArgVec *havec`.
 
-2) From `havec`, extract the args that are attributable to flagged and unflagged
-options, moving each `hestArg` out of main `havec` and into the per-hestOpt
-opt->havec
+3) From `havec`, extract the args that are attributable to flagged ...
+4) ... and unflagged options, moving each `hestArg` out of main `havec` and into
+the per-hestOpt opt->havec
 
-3) For options not user-supplied, process the opt's `dflt` string to set hopt->havec
+5) For options not user-supplied, process the opt's `dflt` string to set hopt->havec
 
-4) Now, every option should have a hopt->havec set, regardless of where it came from.
+6) Now, every option should have a hopt->havec set, regardless of where it came from.
 So parse those per-opt args to set final values for the user to see
 
 What is allocated as result of work here should be freed by hestParseFree
