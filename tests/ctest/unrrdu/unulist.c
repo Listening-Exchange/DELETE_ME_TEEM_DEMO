@@ -52,10 +52,12 @@ main(int argc, const char **argv) {
   fprintf(out, "%s: ################### END unu\n", me);
 
   uci = 0;
+  hparm->respectDashDashHelp = AIR_TRUE;
+  const char *hargv[2] = {"--help", NULL};
   do {
     fprintf(out, "%s: ################### BEGIN (%u) unu %s\n", me, uci,
             unrrduCmdList[uci]->name);
-    ret = unrrduCmdList[uci]->main(0, NULL, unrrduCmdList[uci]->name, hparm);
+    ret = unrrduCmdList[uci]->main(1, hargv, unrrduCmdList[uci]->name, hparm);
     fprintf(out, "%s: ################### END (%u) unu %s (ret=%d)\n", me, uci,
             unrrduCmdList[uci]->name, ret);
     uci++;
