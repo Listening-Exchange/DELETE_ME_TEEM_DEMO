@@ -8,6 +8,7 @@ set(HEST_SOURCES
   privateHest.h
   usage.c
   adders.c
+  argvHest.c
   )
 
 target_sources(teem PRIVATE ${HEST_SOURCES})
