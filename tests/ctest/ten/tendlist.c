@@ -47,9 +47,11 @@ main(int argc, const char **argv) {
   fprintf(out, "%s: ################### END tend (ret=%d)\n", me, ret);
 
   tci = 0;
+  hparm->respectDashDashHelp = AIR_TRUE;
+  const char *hargv[2] = {"--help", NULL};
   do {
     fprintf(out, "%s: ################### BEGIN tend %s\n", me, tendCmdList[tci]->name);
-    ret = tendCmdList[tci]->main(0, NULL, tendCmdList[tci]->name, hparm);
+    ret = tendCmdList[tci]->main(1, hargv, tendCmdList[tci]->name, hparm);
     fprintf(out, "%s: ################### END tend %s (ret=%d)\n", me,
             tendCmdList[tci]->name, ret);
     tci++;
