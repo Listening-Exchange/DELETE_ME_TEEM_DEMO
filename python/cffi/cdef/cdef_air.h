@@ -383,68 +383,70 @@ extern double airJSFRandNormal_d(airJSFRand *jsf);
 extern void airJSFRandNormal2_d(airJSFRand *jsf, double val[2]);
 extern int airJSFRandSanity(void);
 /* ---- END non-NrrdIO */
-/*
-******** airType
-**
-** Different types which air cares about.
-** Currently only used in the command-line parsing, but perhaps will
-** be used elsewhere in air later
-*/
-enum {
-  airTypeUnknown,  /*  0 */
-  airTypeBool,     /*  1 */
-  airTypeInt,      /*  2 */
-  airTypeUInt,     /*  3 */
-  airTypeLongInt,  /*  4 */
-  airTypeULongInt, /*  5 */
-  airTypeSize_t,   /*  6 */
-  airTypeFloat,    /*  7 */
-  airTypeDouble,   /*  8 */
-  airTypeChar,     /*  9 */
-  airTypeString,   /* 10 */
-  airTypeEnum,     /* 11 */
-  airTypeOther,    /* 12 */
-  airTypeLast
-};
-#define AIR_TYPE_MAX 12
+/* changes for for TeemV2:
+ *** airParseStrT() are no longer var-args; it was a mistaken way to enforce uniformity
+ *   across parsers for different types, but it was really only airParseStrE (for
+ *   parsing airEnum values) that needed it.  Then airParseStrS sneakily used it for
+ *   its final "greedy" argument, which was also a bad idea to overcome bad ideas in
+ *   hestParse(), which have since been fixed with its 2025 re-write.
+ *** Renamed airParseStrLI, airParseStrULI --> airParseStrL, airParseStrUL
+ *** Added airParseStrH and airParseStrUH for signed and unsigned shorts
+ *** Removed airStrtokQuoting (another bad idea; used only for "unu make")
+ *** Moved the airTypeT enum values from air to hest, since hest was the motivation for
+ *   creating them so they should be localized to hest. To avoid needlessly breaking code
+ *   that uses hestOptAdd(), which depends on the airTypeT enum values, those have kept
+ *   their names, except:
+ *   *** added airTypeShort and airTypeUShort
+ *   *** renamed airTypeLongInt --> airTypeLong
+ *   *** renamed airTypeULongInt --> airTypeULong
+ *** Moved the following from air to hest, renamed them, and made them private.
+ *   They were only used to implement hest, no where else in Teem, so they never
+ *   deserved to be in air:
+ *     #define AIR_TYPE_MAX --> _HEST_TYPE_MAX
+ *     const char airTypeStr[HEST_TYPE_MAX + 1][AIR_STRLEN_SMALL + 1] --> _hestTypeStr
+ *     const size_t airTypeSize[HEST_TYPE_MAX + 1] --> _hestTypeSize
+ *** Removed the following, since it was only used in the pre-TeemV2 hest
+ *     unsigned int (*const airParseStr[AIR_TYPE_MAX + 1])(void *,
+ *                                                         const char *, *const char *,
+ *                                                         *unsigned int);
+ */
 /* parseAir.c */
 extern double airAtod(const char *str);
 extern int airSingleSscanf(const char *str, const char *fmt, void *ptr);
 extern const airEnum *const airBool;
 extern unsigned int airParseStrB(int *out, const char *s, const char *ct,
-                                     unsigned int n, ... /* (nothing used) */);
+                                     unsigned int n);
+extern unsigned int airParseStrH(short *out, const char *s, const char *ct,
+                                     unsigned int n);
+extern unsigned int airParseStrUH(unsigned short *out, const char *s, const char *ct,
+                                      unsigned int n);
 extern unsigned int airParseStrI(int *out, const char *s, const char *ct,
-                                     unsigned int n, ... /* (nothing used) */);
+                                     unsigned int n);
 extern unsigned int airParseStrUI(unsigned int *out, const char *s, const char *ct,
-                                      unsigned int n, ... /* (nothing used) */);
-extern unsigned int airParseStrLI(long int *out, const char *s, const char *ct,
-                                      unsigned int n, ... /* (nothing used) */);
-extern unsigned int airParseStrULI(unsigned long int *out, const char *s,
-                                       const char *ct, unsigned int n,
-                                       ... /* (nothing used) */);
+                                      unsigned int n);
+extern unsigned int airParseStrL(long int *out, const char *s, const char *ct,
+                                     unsigned int n);
+extern unsigned int airParseStrUL(unsigned long int *out, const char *s,
+                                      const char *ct, unsigned int n);
 extern unsigned int airParseStrZ(size_t *out, const char *s, const char *ct,
-                                     unsigned int n, ... /* (nothing used) */);
+                                     unsigned int n);
 extern unsigned int airParseStrF(float *out, const char *s, const char *ct,
-                                     unsigned int n, ... /* (nothing used) */);
+                                     unsigned int n);
 extern unsigned int airParseStrD(double *out, const char *s, const char *ct,
-                                     unsigned int n, ... /* (nothing used) */);
+                                     unsigned int n);
 extern unsigned int airParseStrC(char *out, const char *s, const char *ct,
-                                     unsigned int n, ... /* (nothing used) */);
+                                     unsigned int n);
 extern unsigned int airParseStrS(char **out, const char *s, const char *ct,
-                                     unsigned int n,
-                                     ... /* REQ'D even if n>1: int greedy */);
+                                     unsigned int n);
 extern unsigned int airParseStrE(int *out, const char *s, const char *ct,
-                                     unsigned int n, ... /* REQUIRED: airEnum *e */);
-extern unsigned int (*const airParseStr[AIR_TYPE_MAX + 1])(void *, const char *,
-                                                               const char *,
-                                                               unsigned int, ...);
+                                     unsigned int n, const airEnum *enm);
 /* string.c */
 extern char *airStrdup(const char *s);
 extern size_t airStrlen(const char *s);
 /* ---- BEGIN non-NrrdIO */
+extern char *airStrunc(char *s, size_t bsize, size_t drop);
 extern int airStrcmp(const char *s1, const char *s2);
 /* ---- END non-NrrdIO */
-extern int airStrtokQuoting;
 extern char *airStrtok(char *s, const char *ct, char **last);
 extern unsigned int airStrntok(const char *s, const char *ct);
 extern char *airStrtrans(char *s, char from, char to);
@@ -508,8 +510,6 @@ extern airULLong airIndexULL(double min, double val, double max, airULLong N);
 extern airULLong airIndexClampULL(double min, double val, double max, airULLong N);
 extern char *airDoneStr(double start, double here, double end, char *str);
 extern double airTime(void);
-extern const char airTypeStr[AIR_TYPE_MAX + 1][AIR_STRLEN_SMALL + 1];
-extern const size_t airTypeSize[AIR_TYPE_MAX + 1];
 extern void airEqvAdd(airArray *eqvArr, unsigned int j, unsigned int k);
 extern unsigned int airEqvMap(airArray *eqvArr, unsigned int *map, unsigned int len);
 extern unsigned int airEqvSettle(unsigned int *map, unsigned int len);
@@ -575,9 +575,9 @@ extern void airMopSub(airArray *arr, void *ptr, airMopper mop);
 extern void airMopMem(airArray *arr, void *_ptrP, int when);
 extern void airMopUnMem(airArray *arr, void *_ptrP);
 extern void airMopPrint(airArray *arr, const void *_str, int when);
-extern void airMopDone(airArray *arr, int error);
-extern void airMopError(airArray *arr);
-extern void airMopOkay(airArray *arr);
+extern airArray *airMopDone(airArray *arr, int error);
+extern airArray *airMopError(airArray *arr);
+extern airArray *airMopOkay(airArray *arr);
 extern void airMopDebug(airArray *arr);
 /* ---- BEGIN non-NrrdIO */
 extern void airMopSingleDone(airArray *arr, void *ptr, int error);
