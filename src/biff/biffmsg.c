@@ -21,10 +21,12 @@
 #include "privateBiff.h"
 
 /*
-** with the Nov'09 re-write of biff, this sourcefile becomes the only
-** place where a static buffer is used for message handling; this
-** should eventually be avoided by using things like asprintf and
-** vasprintf which allocated the string as needed
+With the Nov'09 re-write of biff, this sourcefile becomes the only place where a static
+buffer is used for message handling; this should eventually be avoided by using things
+like asprintf and vasprintf which allocated the string as needed.  However (writing here
+in 2025), vasprintf is not apparently part of any C standard (as per
+https://en.cppreference.com/w/c/experimental/dynamic/asprintf), so we make do with
+snprintf and vsnprintf
 */
 #define _HACK_STRLEN AIR_STRLEN_HUGE
 #define _MSG_INCR    2
@@ -118,7 +120,8 @@ void
 _biffMsgAddVL(biffMsg *msg, const char *errfmt, va_list args) {
   char errstr[_HACK_STRLEN + 1];
 
-  vsprintf(errstr, errfmt, args);
+  /* h/t Jorik Blaas for highlighting need for vsnprintf over vsprintf */
+  vsnprintf(errstr, _HACK_STRLEN + 1, errfmt, args);
   biffMsgAdd(msg, errstr);
   return;
 }
@@ -173,6 +176,7 @@ void
 biffMsgMove(biffMsg *dest, biffMsg *src, const char *err) {
   static const char me[] = "biffMsgMove";
   unsigned int ii;
+  size_t bsize;
   char *buff;
 
   if (&_biffMsgNoop == dest || &_biffMsgNoop == src) {
@@ -189,13 +193,14 @@ biffMsgMove(biffMsg *dest, biffMsg *src, const char *err) {
     return;
   }
 
-  buff = AIR_CALLOC(_biffMsgLineLenMax(src) + 1, char);
+  bsize = _biffMsgLineLenMax(src) + 1;
+  buff = AIR_CALLOC(bsize, char);
   if (!buff) {
     fprintf(stderr, "%s: PANIC: can't allocate buffer\n", me);
     return; /* exit(1); */
   }
   for (ii = 0; ii < src->errNum; ii++) {
-    sprintf(buff, "[%s] %s", src->key, src->err[ii]);
+    snprintf(buff, bsize, "[%s] %s", src->key, src->err[ii]);
     biffMsgAdd(dest, buff);
   }
   free(buff);
@@ -210,7 +215,7 @@ void
 _biffMsgMoveVL(biffMsg *dest, biffMsg *src, const char *errfmt, va_list args) {
   char errstr[_HACK_STRLEN + 1];
 
-  vsprintf(errstr, errfmt, args);
+  vsnprintf(errstr, _HACK_STRLEN + 1, errfmt, args);
   biffMsgMove(dest, src, errstr);
   return;
 }
@@ -294,6 +299,7 @@ void
 biffMsgStrSet(char *ret, const biffMsg *msg) {
   static const char me[] = "biffMsgStrSet";
   char *buff;
+  size_t bsize;
   unsigned int ii;
 
   if (&_biffMsgNoop == msg) {
@@ -303,14 +309,15 @@ biffMsgStrSet(char *ret, const biffMsg *msg) {
     fprintf(stderr, "%s: PANIC got NULL ret", me);
     return;
   }
-  buff = AIR_CALLOC(_biffMsgLineLenMax(msg) + 1, char);
+  bsize = _biffMsgLineLenMax(msg) + 1;
+  buff = AIR_CALLOC(bsize, char);
   if (!buff) {
     fprintf(stderr, "%s: PANIC couldn't alloc buffer", me);
     return; /* exit(1); */
   }
   strcpy(ret, "");
   for (ii = msg->errNum; ii > 0; ii--) {
-    sprintf(buff, "[%s] %s\n", msg->key, msg->err[ii - 1]);
+    snprintf(buff, bsize, "[%s] %s\n", msg->key, msg->err[ii - 1]);
     strcat(ret, buff);
   }
   free(buff);
