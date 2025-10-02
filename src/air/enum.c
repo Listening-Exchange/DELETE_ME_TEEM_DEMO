@@ -142,25 +142,24 @@ airEnumVal(const airEnum *enm, const char *str) {
 }
 
 /*
-******** airEnumFmtDesc()
-**
-** Formats a description line for one element "val" of airEnum "enm",
-** and puts the result in a NEWLY ALLOCATED string which is the return
-** of this function.  The formatting is done via sprintf(), as governed
-** by "fmt", which should contain to "%s" conversion sequences, the
-** first for the string version "val", and the second for the
-** description If "canon", then the canonical string representation
-** will be used (the one in enm->str[]), otherwise the shortest string
-** representation will be used (which differs from the canonical one
-** when there is a strEqv[]/valEqv[] pair defining a shorter string)
-*/
+ ******* airEnumFmtDesc()
+ *
+ * Formats a description line for one element `val` of airEnum `enm`, and puts the result
+ * in a NEWLY ALLOCATED string which is the return of this function.  The formatting is
+ * done via snprintf(), as governed by `fmt`, which should contain two `%s` conversion
+ * sequences, the first for the string version `val`, and the second for the description.
+ * If `canon`, then the canonical string representation will be used (the one in
+ * enm->str[]), otherwise the shortest string representation will be used (which differs
+ * from the canonical one when there is a strEqv[]/valEqv[] pair defining a shorter
+ * string)
+ */
 char *
 airEnumFmtDesc(const airEnum *enm, int val, int canon, const char *fmt) {
   const char *desc;
   char *buff, ident[AIR_STRLEN_SMALL + 1];
   const char *_ident;
   int i;
-  size_t len;
+  size_t bsize, len;
 
   if (!(enm && enm->desc && fmt)) {
     return airStrdup("(airEnumDesc: invalid args)");
@@ -188,9 +187,11 @@ airEnumFmtDesc(const airEnum *enm, int val, int canon, const char *fmt) {
     airToLower(ident);
   }
   desc = enm->desc[_airEnumIndex(enm, val)];
-  buff = AIR_CALLOC(airStrlen(fmt) + airStrlen(ident) + airStrlen(desc) + 1, char);
+  bsize = airStrlen(fmt) + airStrlen(ident) + airStrlen(desc) + 1;
+  buff = AIR_CALLOC(bsize, char);
   if (buff) {
-    sprintf(buff, fmt, ident, desc);
+    /* snprintf just in case our math is wrong */
+    snprintf(buff, bsize, fmt, ident, desc);
   }
   return buff;
 }

@@ -48,9 +48,9 @@ const char *const airTeemReleaseDate = "maybe 2019 or 2020";
 */
 void
 airTeemVersionSprint(char buff[AIR_STRLEN_LARGE + 1]) {
-  sprintf(buff, "Teem version %s, %s%s%s", airTeemVersion,
-          airTeemReleaseDone ? "released on " : "", airTeemReleaseDate,
-          airTeemReleaseDone ? "" : " (not yet released)");
+  snprintf(buff, AIR_STRLEN_LARGE + 1, "Teem version %s, %s%s%s", airTeemVersion,
+           airTeemReleaseDone ? "released on " : "", airTeemReleaseDate,
+           airTeemReleaseDone ? "" : " (not yet released)");
   return;
 }
 
@@ -152,23 +152,25 @@ airFclose(FILE *file) {
 }
 
 /*
-******** airSinglePrintf
-**
-** a complete stand-in for {f|s}printf(), as long as the given format
-** string contains exactly one conversion sequence.  The utility of
-** this is to standardize the printing of IEEE 754 special values:
-** NAN (any kind) -> "NaN"
-** POS_INF -> "+inf"
-** NEG_INF -> "-inf"
-** The format string can contain other things besides just the
-** conversion sequence: airSingleFprintf(f, " (%f)\n", AIR_NAN)
-** will be the same as fprintf(f, " (%s)\n", "NaN");
-**
-** To get fprintf behavior, pass "str" as NULL
-** to get sprintf bahavior, pass "file" as NULL
-**
-** Finding a complete {f|s|}printf replacement is a priority for Teem 2.0
-*/
+ ******* airSinglePrintf
+ *
+ * a complete stand-in for {f|s}printf(), as long as the given format string contains
+ * exactly one conversion sequence, and does use any precision modifiers.  The utility of
+ * this is to standardize the printing of IEEE 754 special values:
+ * NAN (any kind) -> "NaN"
+ * POS_INF -> "+inf"
+ * NEG_INF -> "-inf"
+ * The format string can contain other things besides just the conversion sequence:
+ * airSinglePrintf(f, NULL, " (%f)\n", AIR_NAN) will be the same as:
+ * fprintf(f, " (%s)\n", "NaN");
+ *
+ * To get fprintf behavior, pass "str" as NULL
+ * to get sprintf bahavior, pass "file" as NULL. AND NOTE THAT THIS DOES USE sprintf
+ * and not snprintf because we're not in a position to know what the buffer size is.
+ *
+ * Finding a complete {f|s|}printf replacement would be great, but finding one compatible
+ * with our LGPL+linking exception is hard.
+ */
 int
 airSinglePrintf(FILE *file, char *str, const char *_fmt, ...) {
   char *fmt, buff[AIR_STRLEN_LARGE + 1];
@@ -368,7 +370,7 @@ airPrettySprintSize_t(char str[AIR_STRLEN_SMALL + 1], size_t val) {
       break;
     }
   }
-  sprintf(str, "%g %s", dval, suff[suffIdx]);
+  snprintf(str, AIR_STRLEN_SMALL + 1, "%g %s", dval, suff[suffIdx]);
   return str;
 }
 
@@ -566,15 +568,15 @@ airIndexClampULL(double min, double val, double max, airULLong N) {
 }
 
 /*
-******* airDoneStr()
-**
-** dinky little utility for generating progress messages of the form
-** "  1.9%" or " 35.3%" or  "100.0%"
-**
-** The message will ALWAYS be six characters, and will ALWAYS be
-** preceeded by six backspaces.  Thus, you pass in a string to print
-** into, and it had better be allocated for at least 6+6+1 = 13 chars.
-*/
+ ****** airDoneStr()
+ *
+ * dinky little utility for generating progress messages of the form
+ * "  1.9%" or " 35.3%" or  "100.0%"
+ *
+ * The message will ALWAYS be six characters, and will ALWAYS be preceeded by six
+ * backspaces.  Thus, you pass in a string to sprintf() into (yes sprintf not snprintf),
+ * and it had better be allocated for at least 6+6+1 = 13 chars.
+ */
 char *
 airDoneStr(double start, double here, double end, char *str) {
   int perc = 0;
